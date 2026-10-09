@@ -107,8 +107,9 @@ def make_training_args(output_dir, **overrides):
 
 def build_trainer(model, tokenizer, train_ds, val_ds, lora_config, training_args):
     from trl import SFTTrainer
+    import torch
 
-    return SFTTrainer(
+    trainer = SFTTrainer(
         model=model,
         args=training_args,
         train_dataset=train_ds,
@@ -116,6 +117,12 @@ def build_trainer(model, tokenizer, train_ds, val_ds, lora_config, training_args
         processing_class=tokenizer,
         peft_config=lora_config,
     )
+    # Les paramètres LoRA entraînables doivent être en float32 : sur un T4 (fp16),
+    # le GradScaler ne sait pas traiter des gradients en bfloat16.
+    for p in trainer.model.parameters():
+        if p.requires_grad and p.dtype != torch.float32:
+            p.data = p.data.float()
+    return trainer
 
 
 # ---------------------------------------------------------------------------
