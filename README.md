@@ -13,3 +13,8 @@ Fine-tuning a small open-source LLM with LoRA/QLoRA to generate SQL queries on f
 ## 9. Limitations
 ## 10. Conclusion
 ## 11. Références
+
+
+
+# Open in colab :
+https://colab.research.google.com/github/TON_USER/text2sql-finance-qlora/blob/main/notebooks/01_exploration_donnees.ipynb
