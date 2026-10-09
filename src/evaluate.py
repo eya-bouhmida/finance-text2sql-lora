@@ -107,6 +107,40 @@ def summarize_by(df, column="sql_complexity"):
               .sort_values("n", ascending=False))
 
 
+# ---------------------------------------------------------------------------
+# Statistiques pour la comparaison baseline / fine-tuné
+# ---------------------------------------------------------------------------
+
+def wilson_ci(k, n, z=1.96):
+    """Intervalle de confiance à 95 % (Wilson) d'une proportion k/n, en %."""
+    import math
+    if n == 0:
+        return (0.0, 0.0)
+    p = k / n
+    denom = 1 + z ** 2 / n
+    center = (p + z ** 2 / (2 * n)) / denom
+    half = z * math.sqrt(p * (1 - p) / n + z ** 2 / (4 * n ** 2)) / denom
+    return (round(100 * (center - half), 1), round(100 * (center + half), 1))
+
+
+def mcnemar_test(correct_a, correct_b):
+    """Test exact de McNemar sur des prédictions appariées (mêmes questions).
+
+    Ne regarde que les questions où les deux modèles diffèrent :
+      b = A juste et B faux, c = A faux et B juste.
+    Renvoie (b, c, p_value). p < 0.05 : la différence n'est pas due au hasard.
+    """
+    import math
+    b = int(sum(1 for x, y in zip(correct_a, correct_b) if x and not y))
+    c = int(sum(1 for x, y in zip(correct_a, correct_b) if not x and y))
+    n = b + c
+    if n == 0:
+        return b, c, 1.0
+    k = min(b, c)
+    p = 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n
+    return b, c, min(1.0, p)
+
+
 def save_json(obj, path):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
