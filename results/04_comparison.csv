@@ -1,0 +1,3 @@
+Modèle,Execution accuracy (%),IC 95 % (%),SQL valide (%),Exact match (%),Temps / question (s),Mémoire GPU inférence (Go),Paramètres entraînés,Taille à stocker
+Baseline (Qwen2.5-Coder-1.5B),58.86,[51.1 ; 66.2],92.41,24.68,0.363,3.21,0,≈ 3 Go (modèle)
+Fine-tuné QLoRA (r = 16),71.52,[64.0 ; 78.0],98.73,38.61,0.598,3.35,"≈ 18,5 M (≈ 1,2 %)",85.3 Mo (adaptateur)

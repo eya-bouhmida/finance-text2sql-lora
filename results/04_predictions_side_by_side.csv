@@ -1,0 +1,418 @@
+question,gold_sql,baseline_sql,baseline_ok,finetuned_sql,finetuned_ok
+What is the maximum daily investment for each client?,"SELECT client_id, MAX(investment) OVER (PARTITION BY client_id ORDER BY client_id) as max_daily_investment FROM daily_investments;","SELECT client_id, MAX(investment) AS max_daily_investment
+FROM daily_investments
+GROUP BY client_id;",True,"SELECT client_id, MAX(investment) as max_investment FROM daily_investments GROUP BY client_id;",True
+What is the sum of investments in healthcare for each region?,"SELECT i.region, SUM(i.amount) FROM investments i WHERE i.sector = 'Healthcare' GROUP BY i.region;","SELECT region, SUM(amount) as total_investments
+FROM investments
+WHERE sector = 'Healthcare'
+GROUP BY region;",True,"SELECT region, SUM(amount) FROM investments WHERE sector = 'Healthcare' GROUP BY region;",True
+What are the names and total transactions of all Shariah-compliant financial institutions from the finance database?,"SELECT name, SUM(total_transactions) FROM shariah_compliant_institutions;","SELECT name, total_transactions FROM shariah_compliant_institutions;",False,"SELECT name, total_transactions FROM shariah_compliant_institutions;",False
+"List all transactions with a value greater than $10,000, along with the customer ID and the transaction date, in descending order of transaction date?",SELECT * FROM transactions WHERE transaction_value > 10000 ORDER BY transaction_date DESC;,"SELECT transaction_id, customer_id, transaction_value, transaction_date 
+FROM transactions 
+WHERE transaction_value > 10000 
+ORDER BY transaction_date DESC;",True,SELECT * FROM transactions WHERE transaction_value > 10000 ORDER BY transaction_date DESC;,True
+What is the average account balance for customers in each investment strategy?,"SELECT strategy_name, AVG(account_balance) FROM customers GROUP BY strategy_name;","SELECT strategy_name, AVG(account_balance) AS avg_balance
+FROM customers
+GROUP BY strategy_name;",True,"SELECT strategy_name, AVG(account_balance) FROM customers GROUP BY strategy_name;",True
+What is the total number of high-risk accounts in the Northwest region?,SELECT COUNT(*) FROM accounts_by_region WHERE region = 'Northwest' AND risk_level = 'high';,SELECT SUM(risk_level = 'high') FROM accounts_by_region WHERE region = 'Northwest';,True,SELECT COUNT(*) FROM accounts_by_region WHERE region = 'Northwest' AND risk_level = 'high';,True
+List all Shariah-compliant financial products offered in the Southeast Asian region,SELECT product_name FROM shariah_compliant_products WHERE region = 'Southeast Asia';,SELECT product_name FROM shariah_compliant_products WHERE region = 'Southeast Asian';,False,SELECT * FROM shariah_compliant_products WHERE region = 'Southeast Asia';,False
+What is the average claim amount in the 'East' region?,SELECT AVG(Amount) FROM Claims WHERE Region = 'East';,SELECT AVG(Amount) FROM Claims WHERE Region = 'East';,True,SELECT AVG(Amount) FROM Claims WHERE Region = 'East';,True
+Find the number of companies founded by women in each country.,"SELECT country, COUNT(*) as num_female_founded FROM Companies WHERE founder_gender = 'Female' GROUP BY country;","SELECT country, COUNT(*) AS num_women_companies
+FROM Companies
+WHERE founder_gender = 'Female'
+GROUP BY country;",True,"SELECT country, COUNT(*) FROM Companies WHERE founder_gender = 'Female' GROUP BY country;",True
+What is the total funding for startups in the 'Software' industry founded before 2015?,SELECT SUM(total_funding) FROM startups WHERE industry = 'Software' AND founded_year < 2015;,SELECT SUM(total_funding) FROM startups WHERE industry = 'Software' AND founded_year < 2015;,True,SELECT SUM(total_funding) FROM startups WHERE industry = 'Software' AND founded_year < 2015;,True
+What is the average account balance for clients in Asia in Q2 2022?,"SELECT AVG(balance) as avg_balance FROM accounts WHERE country IN ('India', 'China', 'Japan') AND account_date BETWEEN '2022-04-01' AND '2022-06-30';","SELECT AVG(balance) AS avg_balance
+FROM accounts
+WHERE country = 'Asia'
+AND strftime('%Y-%m', account_date) LIKE '2022-04-%';",False,"SELECT AVG(balance) FROM accounts WHERE country IN ('China', 'Japan') AND account_date BETWEEN '2022-04-01' AND '2022-06-30';",False
+What is the average loan amount for clients in Turkey and Iran?,"SELECT AVG(amount) FROM loans WHERE country IN ('Turkey', 'Iran');","SELECT AVG(amount) AS avg_loan_amount
+FROM loans
+WHERE country IN ('Turkey', 'Iran');",True,"SELECT AVG(amount) FROM loans WHERE country IN ('Turkey', 'Iran');",True
+What is the average transaction value for Shariah-compliant investments in the United States?,SELECT AVG(value) FROM shariah_investments WHERE country = 'United States';,"SELECT AVG(value) AS average_value
+FROM shariah_investments
+WHERE country = 'United States';",True,SELECT AVG(value) FROM shariah_investments WHERE country = 'United States';,True
+Display policy_id and sum_insured for policies where the sum insured is less than 60000 and policyholder gender is female,"SELECT policy_info.policy_id, policy_info.sum_insured FROM policy_info INNER JOIN policyholder ON policy_info.policy_id = policyholder.policy_id WHERE policy_info.sum_insured < 60000 AND policyholder.gender = 'Female';","SELECT policy_id, sum_insured FROM policy_info WHERE sum_insured < 60000 AND policyholder.gender = 'Female';",False,"SELECT policy_id, sum_insured FROM policy_info JOIN policyholder ON policy_info.policy_id = policyholder.policy_id WHERE sum_insured < 60000 AND policyholder.gender = 'Female';",False
+"Which customers have made a transaction over 500 in the ""risk_management"" category?",SELECT c.name FROM customers c INNER JOIN transactions t ON c.id = t.customer_id WHERE c.category = 'risk_management' AND t.amount > 500;,"SELECT c.name FROM customers c
+JOIN transactions t ON c.id = t.customer_id
+WHERE t.amount > 500 AND c.category = 'risk_management';",True,SELECT c.name FROM customers c JOIN transactions t ON c.id = t.customer_id WHERE c.category = 'risk_management' AND t.amount > 500;,True
+How many clients have taken out socially responsible loans in each country?,"SELECT country, COUNT(DISTINCT client_id) as num_clients FROM socially_responsible_loans GROUP BY country;","SELECT COUNT(*) AS num_clients, country FROM socially_responsible_loans GROUP BY country;",False,"SELECT country, COUNT(*) FROM socially_responsible_loans GROUP BY country;",True
+What is the total amount of Shariah-compliant loans issued by each financial institution in Oceania?,"SELECT institution_id, SUM(amount) FROM loans WHERE loan_type = 'Shariah-compliant' AND institution_id IN (SELECT institution_id FROM financial_institutions WHERE institution_name LIKE '%Oceania%') GROUP BY institution_id;","SELECT f.institution_name, SUM(l.amount) as total_shariah_loans
+FROM financial_institutions f
+JOIN loans l ON f.institution_id = l.institution_id
+WHERE f.country IN ('Oceania') AND l.loan_type = 'Shariah'
+GROUP BY f.institution_name;",False,"SELECT institution_name, SUM(amount) FROM loans WHERE loan_type = 'Shariah-compliant' GROUP BY institution_name;",False
+What is the total income of clients in Canada who are socially responsible investors?,SELECT SUM(income) FROM clients WHERE country = 'Canada' AND is_socially_responsible_investor = true;,SELECT SUM(income) FROM clients WHERE country = 'Canada' AND is_socially_responsible_investor = TRUE;,True,SELECT SUM(income) FROM clients WHERE country = 'Canada' AND is_socially_responsible_investor = TRUE;,True
+How many clients have a compliance status of 'Non-compliant'?,SELECT COUNT(*) as number_of_non_compliant_clients FROM regulatory_compliance WHERE compliance_status = 'Non-compliant';,SELECT COUNT(*) FROM regulatory_compliance WHERE compliance_status = 'Non-compliant';,True,SELECT COUNT(*) FROM regulatory_compliance WHERE compliance_status = 'Non-compliant';,True
+How many social impact investments were made in India in 2020?,SELECT COUNT(*) FROM investments WHERE investment_year = 2020 AND country = 'India' AND investment_type = 'social impact';,SELECT COUNT(*) FROM investments WHERE investment_type = 'Social Impact' AND investment_year = 2020 AND country = 'India';,True,SELECT COUNT(*) FROM investments WHERE investment_year = 2020 AND investment_type = 'social impact' AND country = 'India';,True
+How many startups in each country have a female founder?,"SELECT s.country, COUNT(*) FROM startup s WHERE s.founder_gender = 'Female' GROUP BY s.country;","SELECT country, COUNT(*) FROM startup WHERE founder_gender = 'Female' GROUP BY country;",True,"SELECT country, COUNT(*) FROM startup WHERE founder_gender = 'Female' GROUP BY country;",True
+What is the average investment in sustainable agriculture per country?,"SELECT country, AVG(amount) as avg_investment FROM investments WHERE sector = 'Sustainable Agriculture' GROUP BY country;","SELECT AVG(amount) AS average_investment
+FROM investments
+WHERE sector = 'Sustainable Agriculture';",False,SELECT AVG(amount) FROM investments WHERE sector = 'Sustainable Agriculture';,False
+What is the average policy duration for policyholders in the West region with a risk score between 600 and 800?,SELECT AVG(p.PolicyDuration) as AvgPolicyDuration FROM Policyholders p WHERE p.Region = 'West' AND p.RiskScore BETWEEN 600 AND 800;,SELECT AVG(PolicyDuration) FROM Policyholders WHERE Region = 'West' AND RiskScore BETWEEN 600 AND 800;,True,SELECT AVG(PolicyDuration) FROM Policyholders WHERE Region = 'West' AND RiskScore BETWEEN 600 AND 800;,True
+What is the average financial wellbeing score in Q2 2022 for customers with a Shariah-compliant finance account?,SELECT AVG(financial_wellbeing_score) FROM shariah_compliant_customers WHERE shariah_compliant_account = true AND wellbeing_assessment_date BETWEEN '2022-04-01' AND '2022-06-30';,"SELECT AVG(financial_wellbeing_score) 
+FROM shariah_compliant_customers 
+WHERE wellbeing_assessment_date BETWEEN '2022-04-01' AND '2022-06-30';",False,SELECT AVG(financial_wellbeing_score) FROM shariah_compliant_customers WHERE shariah_compliant_account = TRUE AND wellbeing_assessment_date BETWEEN '2022-04-01' AND '2022-06-30';,True
+What is the maximum amount invested by a client in Shariah-compliant funds?,"SELECT clients.client_name, MAX(shariah_compliant_funds_investments.amount_invested) FROM clients JOIN shariah_compliant_funds_investments ON clients.client_id = shariah_compliant_funds_investments.client_id;","SELECT MAX(amount_invested) FROM shariah_compliant_funds_investments WHERE client_id IN (
+    SELECT client_id FROM clients WHERE client_name = 'Shariah Compliant'
+);",False,SELECT MAX(amount_invested) FROM shariah_compliant_funds_investments JOIN clients ON shariah_compliant_funds_investments.client_id = clients.client_id WHERE clients.client_name = 'John Doe';,False
+Find the total number of policies issued by 'Department A' and 'Department B'?,"SELECT COUNT(*) FROM policies WHERE department IN ('Department A', 'Department B');","SELECT SUM(CASE WHEN department = 'Department A' THEN 1 ELSE 0 END) + 
+       SUM(CASE WHEN department = 'Department B' THEN 1 ELSE 0 END) AS total_policies
+FROM policies;",True,"SELECT COUNT(*) FROM policies WHERE department IN ('Department A', 'Department B');",True
+"What is the minimum investment of clients in the ""Commodity"" fund?",SELECT MIN(clients.investment) FROM clients INNER JOIN fund_investments ON clients.client_id = fund_investments.client_id WHERE fund_investments.fund_name = 'Commodity';,SELECT MIN(investment) FROM fund_investments WHERE fund_name = 'Commodity';,True,SELECT MIN(clients.investment) FROM clients INNER JOIN fund_investments ON clients.client_id = fund_investments.client_id WHERE fund_investments.fund_name = 'Commodity';,True
+What is the average transaction amount for retail customers in New York?,SELECT AVG(transaction_amount) FROM retail_customers WHERE state = 'NY';,SELECT AVG(transaction_amount) FROM retail_customers WHERE state = 'NY';,True,SELECT AVG(transaction_amount) FROM retail_customers WHERE state = 'New York';,False
+What is the total assets of clients who have invested in both stocks and bonds?,"SELECT c.total_assets FROM clients c INNER JOIN investments i ON c.client_id = i.client_id WHERE i.investment_type IN ('Stocks', 'Bonds') GROUP BY c.client_id HAVING COUNT(DISTINCT i.investment_type) = 2;","SELECT SUM(total_assets) 
+FROM clients 
+WHERE client_id IN (
+    SELECT client_id 
+    FROM investments 
+    WHERE investment_type = 'stocks' 
+);",False,"SELECT SUM(clients.total_assets) FROM clients INNER JOIN investments ON clients.client_id = investments.client_id WHERE investments.investment_type IN ('stocks', 'bonds') GROUP BY clients.client_id HAVING COUNT(DISTINCT investments.investment_type) = 2;",False
+"How many high-risk accounts are in the Asia-Pacific region with a balance greater than $100,000?",SELECT COUNT(*) FROM accounts WHERE region = 'Asia-Pacific' AND risk_level = 'high' AND balance > 100000.00;,SELECT COUNT(*) FROM accounts WHERE region = 'Asia-Pacific' AND risk_level = 'high' AND balance > 100000;,True,SELECT COUNT(*) FROM accounts WHERE region = 'Asia-Pacific' AND risk_level = 'high' AND balance > 100000;,True
+List all clients with their age and the total number of investments they made?,"SELECT c.age, COUNT(i.investment_type) AS num_investments FROM clients c LEFT JOIN investments i ON c.client_id = i.client_id GROUP BY c.client_id;","SELECT c.name, c.age, COUNT(i.investment_type) AS total_investments
+FROM clients c
+JOIN investments i ON c.client_id = i.client_id
+GROUP BY c.client_id;",False,"SELECT c.name, c.age, COUNT(i.client_id) FROM clients c JOIN investments i ON c.client_id = i.client_id GROUP BY c.client_id;",False
+How many socially responsible loans were issued to customers in the South?,SELECT COUNT(*) FROM loans WHERE is_socially_responsible = true AND region = 'South';,SELECT COUNT(*) FROM loans WHERE is_socially_responsible = TRUE AND region = 'South';,True,SELECT COUNT(*) FROM loans WHERE is_socially_responsible = true AND region = 'South';,True
+What is the maximum socially responsible loan amount?,SELECT MAX(loans.amount) as max_loan_amount FROM loans WHERE loans.is_socially_responsible = TRUE;,SELECT MAX(amount) FROM loans WHERE is_socially_responsible = TRUE;,True,SELECT MAX(amount) FROM loans WHERE is_socially_responsible = true;,True
+What was the total amount of Shariah-compliant finance loans issued to micro businesses in 2021?,SELECT SUM(loan_amount) FROM shariah_compliant_finance WHERE borrower_type = 'Micro Business' AND lending_date BETWEEN '2021-01-01' AND '2021-12-31';,SELECT SUM(loan_amount) AS total_shariah_loans FROM shariah_compliant_finance WHERE borrower_type = 'Micro Business' AND YEAR(lending_date) = 2021;,False,SELECT SUM(loan_amount) FROM shariah_compliant_finance WHERE borrower_type = 'microbusiness' AND lending_date BETWEEN '2021-01-01' AND '2021-12-31';,True
+Find the average age of policyholders in Texas.,SELECT AVG(age) FROM policyholders WHERE state = 'Texas';,SELECT AVG(age) FROM policyholders WHERE state = 'Texas';,True,SELECT AVG(age) FROM policyholders WHERE state = 'Texas';,True
+What is the average car manufacturing year for policy number 1003?,SELECT AVG(car_manufacture_year) FROM policies WHERE policy_id = 1003;,SELECT AVG(car_manufacture_year) FROM policies WHERE policy_id = 1003;,True,SELECT AVG(car_manufacture_year) FROM policies WHERE policy_id = 1003;,True
+"How many policyholders from Brazil have an annual income greater than $50,000, and what is the average claim amount for this group?","SELECT COUNT(*) AS HighIncomePolicyholders, AVG(ClaimAmount) AS AvgClaimAmount FROM Claims JOIN Policyholders ON Claims.PolicyholderID = Policyholders.PolicyholderID WHERE Policyholders.Country = 'Brazil' AND Policyholders.AnnualIncome > 50000;","SELECT COUNT(*) AS NumberOfBrazilianPolicyholders, AVG(ClaimAmount) AS AverageClaimAmount
+FROM Policyholders
+JOIN Claims ON Policyholders.PolicyholderID = Claims.PolicyholderID
+WHERE Policyholders.Country = 'Brazil' AND Policyholders.AnnualIncome > 50000;",True,"SELECT COUNT(*) as NumPolicyholders, AVG(Claims.ClaimAmount) as AvgClaimAmount FROM Policyholders INNER JOIN Claims ON Policyholders.PolicyholderID = Claims.PolicyholderID WHERE Policyholders.Country = 'Brazil' AND Policyholders.AnnualIncome > 50000;",True
+What is the total number of policies for 'High-Risk' drivers?,SELECT COUNT(*) FROM policies WHERE driver_risk = 'High-Risk';,SELECT COUNT(*) FROM policies WHERE driver_risk = 'High-Risk';,True,SELECT COUNT(*) FROM policies WHERE driver_risk = 'High-Risk';,True
+List all the transactions made by clients living in New York with a transaction amount greater than $1000.,"SELECT transactions.id, transactions.client_id, transactions.transaction_amount, transactions.transaction_date FROM transactions INNER JOIN clients ON transactions.client_id = clients.id WHERE clients.state = 'New York' AND transactions.transaction_amount > 1000.00;","SELECT t.id, t.client_id, t.transaction_amount, t.transaction_date
+FROM transactions t
+JOIN clients c ON t.client_id = c.id
+WHERE c.state = 'New York' AND t.transaction_amount > 1000;",True,SELECT * FROM transactions JOIN clients ON transactions.client_id = clients.id WHERE clients.state = 'New York' AND transactions.transaction_amount > 1000;,False
+"How many companies does 'Impact Fund 1' have investments in, and what's their average ESG rating?","SELECT COUNT(DISTINCT companies.id), AVG(companies.ESG_rating) FROM investments INNER JOIN companies ON investments.company_id = companies.id WHERE investments.fund_name = 'Impact Fund 1';","SELECT COUNT(DISTINCT c.id) AS num_companies, AVG(c.esg_rating) AS avg_esg_rating
+FROM investments i
+JOIN companies c ON i.company_id = c.id
+WHERE i.fund_name = 'Impact Fund 1';",True,"SELECT COUNT(*) as num_investments, AVG(companies.ESG_rating) as avg_ESG_rating FROM investments INNER JOIN companies ON investments.company_id = companies.id WHERE investments.fund_name = 'Impact Fund 1';",True
+What is the maximum ESG score for companies in the education sector in Q3 2020?,SELECT MAX(esg_score) FROM companies WHERE sector = 'Education' AND quarter = 3 AND year = 2020;,SELECT MAX(esg_score) FROM companies WHERE sector = 'education' AND quarter = 3 AND year = 2020;,False,SELECT MAX(esg_score) FROM companies WHERE sector = 'Education' AND quarter = 3 AND year = 2020;,True
+How many claims were processed for each policy type in the Underwriting department in Q3 2022?,"SELECT PolicyType, COUNT(*) as TotalClaims FROM Claims WHERE ProcessingDepartment = 'Underwriting' AND ProcessingDate BETWEEN '2022-07-01' AND '2022-09-30' GROUP BY PolicyType;","SELECT PolicyType, COUNT(*) AS ClaimCount
+FROM Claims
+WHERE ProcessingDepartment = 'Underwriting'
+AND strftime('%Y-%m', ProcessingDate) LIKE '2022-09%'
+GROUP BY PolicyType;",False,"SELECT PolicyType, COUNT(*) as ClaimCount FROM Claims WHERE ProcessingDepartment = 'Underwriting' AND ProcessingDate BETWEEN '2022-07-01' AND '2022-09-30' GROUP BY PolicyType;",True
+What is the maximum claim amount for pet insurance policies?,SELECT MAX(ClaimAmount) FROM PetPolicies;,SELECT MAX(ClaimAmount) FROM PetPolicies;,True,SELECT MAX(ClaimAmount) FROM PetPolicies;,True
+What is the average balance for customers in the West region?,SELECT AVG(balance) FROM customers WHERE region = 'West';,SELECT AVG(balance) FROM customers WHERE region = 'West';,True,SELECT AVG(balance) FROM customers WHERE region = 'West';,True
+What is the maximum transaction amount for clients in the Americas region?,SELECT MAX(amount) FROM transactions JOIN clients ON transactions.client_id = clients.client_id WHERE clients.region = 'North America';,"SELECT MAX(amount) FROM transactions WHERE client_id IN (
+    SELECT client_id FROM clients WHERE region = 'Americas'
+);",False,SELECT MAX(amount) FROM transactions JOIN clients ON transactions.client_id = clients.client_id WHERE clients.region = 'Americas';,False
+Find the top 5 salespeople by total sales,"SELECT salesperson_id, SUM(amount) as total_sales FROM salesperson_sales GROUP BY salesperson_id ORDER BY total_sales DESC LIMIT 5;","SELECT salesperson_id, SUM(amount) as total_sales
+FROM salesperson_sales
+GROUP BY salesperson_id
+ORDER BY total_sales DESC
+LIMIT 5;",True,"SELECT salesperson_id, SUM(amount) as total_sales FROM salesperson_sales GROUP BY salesperson_id ORDER BY total_sales DESC LIMIT 5;",True
+"Find the top 3 policy types with the highest number of claims in Canada, ordered by the total claim amount in descending order.","SELECT PolicyType, COUNT(*) AS ClaimCount, SUM(ClaimAmount) AS TotalClaimAmount FROM Claims WHERE PolicyholderCountry = 'Canada' GROUP BY PolicyType ORDER BY TotalClaimAmount DESC, ClaimCount DESC LIMIT 3;","SELECT PolicyType, SUM(ClaimAmount) AS TotalClaimAmount
+FROM Claims
+WHERE PolicyholderCountry = 'Canada'
+GROUP BY PolicyType
+ORDER BY TotalClaimAmount DESC
+LIMIT 3;",False,"SELECT PolicyType, SUM(ClaimAmount) AS TotalClaimAmount FROM Claims WHERE PolicyholderCountry = 'Canada' GROUP BY PolicyType ORDER BY TotalClaimAmount DESC LIMIT 3;",False
+Find the total value of social impact bonds issued by each organization.,"SELECT organization_name, SUM(value) as total_value FROM social_impact_bonds GROUP BY organization_name;","SELECT organization_name, SUM(value) as total_value
+FROM social_impact_bonds
+GROUP BY organization_name;",True,"SELECT organization_name, SUM(value) FROM social_impact_bonds GROUP BY organization_name;",True
+"List all social impact investments in the Healthcare sector with ESG scores above 80, ordered by investment date and ESGScore, including only investments made by investors from the United Kingdom.","SELECT * FROM SocialImpactInvestments WHERE Sector = 'Healthcare' AND ESGScore > 80 AND InvestorCountry = 'UK' ORDER BY InvestmentDate, ESGScore DESC;","SELECT *
+FROM SocialImpactInvestments
+WHERE Sector = 'Healthcare' AND ESGScore > 80 AND InvestorCountry = 'United Kingdom'
+ORDER BY InvestmentDate, ESGScore;",False,"SELECT * FROM SocialImpactInvestments WHERE Sector = 'Healthcare' AND ESGScore > 80 AND InvestorCountry = 'United Kingdom' ORDER BY InvestmentDate, ESGScore DESC;",False
+"How many clients have taken out socially responsible loans in each country, excluding loans from clients in Saudi Arabia and the UAE?","SELECT client_country, COUNT(DISTINCT client_id) as num_clients FROM socially_responsible_loans WHERE client_country NOT IN ('Saudi Arabia', 'UAE') GROUP BY client_country;","SELECT client_country, COUNT(*) AS loan_count
+FROM socially_responsible_loans
+WHERE client_country NOT IN ('Saudi Arabia', 'UAE')
+GROUP BY client_country;",True,"SELECT client_country, COUNT(*) FROM socially_responsible_loans WHERE client_country NOT IN ('Saudi Arabia', 'UAE') GROUP BY client_country;",True
+What is the total transaction amount for each employee in the Risk Management department?,"SELECT e.name, SUM(t.transaction_amount) as total_transaction_amount FROM employees e JOIN transactions t ON e.id = t.employee_id WHERE e.department = 'Risk Management' GROUP BY e.name;","SELECT e.name, SUM(t.transaction_amount) as total_transaction_amount
+FROM employees e
+JOIN transactions t ON e.id = t.employee_id
+WHERE e.department = 'Risk Management'
+GROUP BY e.name;",True,"SELECT e.name, SUM(t.transaction_amount) as total_transaction_amount FROM employees e JOIN transactions t ON e.id = t.employee_id WHERE e.department = 'Risk Management' GROUP BY e.name;",True
+What is the maximum consecutive number of days with a financial wellbeing score below 60 for each customer?,"SELECT customer_id, MAX(consecutive_below_60) FROM (SELECT customer_id, score_date, financial_wellbeing_score, COUNT(*) FILTER (WHERE financial_wellbeing_score < 60) OVER (PARTITION BY customer_id ORDER BY score_date ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS consecutive_below_60 FROM customer_scores) subquery GROUP BY customer_id;","SELECT 
+    customer_id,
+    MAX(DISTINCT score_date) - MIN(DISTINCT score_date) + 1 AS max_consecutive_days_below_60
+FROM 
+    customer_scores
+WHERE 
+    financial_wellbeing_score < 60
+GROUP BY 
+    customer_id;",False,"SELECT customer_id, MAX(days_below_60) FROM (SELECT customer_id, score_date, LAG(financial_wellbeing_score, 1) OVER (PARTITION BY customer_id ORDER BY score_date) AS prev_score, CASE WHEN financial_wellbeing_score < 60 THEN 1 ELSE 0 END AS days_below_60 FROM customer_scores) AS subquery GROUP BY customer_id;",True
+Obtain the total number of policies issued in 'Q2 2021',SELECT COUNT(*) FROM policies WHERE issue_date BETWEEN '2021-04-01' AND '2021-06-30';,"SELECT COUNT(*) FROM policies WHERE strftime('%Y-%m', issue_date) = '2021-06';",True,SELECT COUNT(*) FROM policies WHERE issue_date BETWEEN '2021-04-01' AND '2021-06-30';,True
+What is the client's total investment and the number of investments they have made?,"SELECT client_id, name, SUM(investment) OVER (PARTITION BY client_id ORDER BY client_id) as total_investment, COUNT(*) OVER (PARTITION BY client_id ORDER BY client_id) as number_of_investments FROM clients;","SELECT SUM(investment) AS total_investment, COUNT(*) AS num_investments
+FROM clients;",False,"SELECT client_id, SUM(investment) as total_investment, COUNT(*) as num_investments FROM clients GROUP BY client_id;",False
+What is the percentage of diverse individuals in the workforce for companies with headquarters in 'Indonesia' and 'Argentina'?,"SELECT d.company_id, ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM diversity WHERE company_id = d.company_id), 2) as percentage FROM diversity d WHERE (SELECT country FROM company WHERE id = d.company_id) IN ('Indonesia', 'Argentina') GROUP BY d.company_id;","SELECT 
+    CAST(SUM(CASE WHEN T1.race IN ('Asian', 'Black', 'Hispanic') THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) AS diversity_percentage
+FROM 
+    diversity AS T1
+JOIN 
+    company AS T2 ON T1.company_id = T2.id
+WHERE 
+    T2.country IN ('Indonesia', 'Argentina');",False,"SELECT (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM diversity)) as percentage FROM diversity INNER JOIN company ON diversity.company_id = company.id WHERE company.country IN ('Indonesia', 'Argentina');",False
+How many high-risk transactions occurred in the 'EMEA' region in the last quarter?,SELECT COUNT(*) FROM transactions WHERE region = 'EMEA' AND transaction_date >= '2021-01-01' AND transaction_date <= '2021-03-31';,"SELECT COUNT(*) 
+FROM transactions 
+WHERE region = 'EMEA' AND transaction_date >= date('now', '-3 months');",False,SELECT COUNT(*) FROM transactions WHERE region = 'EMEA' AND transaction_date >= '2023-10-01' AND transaction_date < '2024-01-01';,False
+List all the clients from the Socially Responsible Microfinance program and their account balances.,SELECT * FROM microfinance_program WHERE program_name = 'Socially Responsible Microfinance';,"SELECT client_id, account_balance FROM microfinance_program WHERE program_name = 'Socially Responsible Microfinance';",False,"SELECT client_id, account_balance FROM microfinance_program WHERE program_name = 'Socially Responsible Microfinance';",False
+What is the total amount of interest earned from socially responsible lending?,SELECT SUM(s.amount * s.interest_rate) FROM socially_responsible_loans s;,SELECT SUM(amount * interest_rate) AS total_interest_earned FROM socially_responsible_loans;,True,SELECT SUM(amount * interest_rate) FROM socially_responsible_loans;,True
+Show the top 5 customers by total transaction amount in Australia.,"SELECT customer_id, SUM(transaction_amount) AS total_amount FROM transactions WHERE country = 'Australia' GROUP BY customer_id ORDER BY total_amount DESC LIMIT 5;","SELECT customer_id, SUM(transaction_amount) AS total_transaction_amount
+FROM transactions
+WHERE country = 'Australia'
+GROUP BY customer_id
+ORDER BY total_transaction_amount DESC
+LIMIT 5;",True,"SELECT customer_id, SUM(transaction_amount) as total_transaction_amount FROM transactions WHERE country = 'Australia' GROUP BY customer_id ORDER BY total_transaction_amount DESC LIMIT 5;",True
+Show the number of green bond issuances for each country and the total value of green bonds issued for each country.,"SELECT issuer_country, COUNT(*) as num_issuances, SUM(value) as total_value FROM green_bonds GROUP BY issuer_country;","SELECT 
+    issuer_country,
+    COUNT(*) AS num_issuances,
+    SUM(value) AS total_value
+FROM 
+    green_bonds
+GROUP BY 
+    issuer_country;",True,"SELECT issuer_country, COUNT(*) as num_issuances, SUM(value) as total_value FROM green_bonds GROUP BY issuer_country;",True
+What is the average account balance for clients in the Islamic Banking segment?,SELECT AVG(account_balance) FROM islamic_banking_clients WHERE segment = 'Islamic Banking';,SELECT AVG(account_balance) FROM islamic_banking_clients WHERE segment = 'Islamic Banking';,True,SELECT AVG(account_balance) FROM islamic_banking_clients WHERE segment = 'Islamic Banking';,True
+What was the total amount of social impact investments made by 'Green Capital' in Q1 2021?,SELECT SUM(amount) FROM investments WHERE investor = 'Green Capital' AND date BETWEEN '2021-01-01' AND '2021-03-31';,"SELECT SUM(amount) AS total_social_impact
+FROM investments
+WHERE investor = 'Green Capital'
+AND strftime('%Y-%m', date) = '2021-01';",True,SELECT SUM(amount) FROM investments WHERE investor = 'Green Capital' AND date BETWEEN '2021-01-01' AND '2021-03-31';,True
+What is the maximum financial wellbeing score for customers who have a socially responsible loan?,SELECT MAX(srl.financial_wellbeing_score) FROM socially_responsible_loans srl JOIN socially_responsible_lending srlg ON srl.loan_id = srlg.loan_id;,SELECT MAX(financial_wellbeing_score) FROM socially_responsible_loans WHERE loan_id IN (SELECT loan_id FROM socially_responsible_lending);,True,SELECT MAX(socially_responsible_loans.financial_wellbeing_score) FROM socially_responsible_loans INNER JOIN socially_responsible_lending ON socially_responsible_loans.loan_id = socially_responsible_lending.loan_id;,True
+What is the average funding round size for startups founded by women in the healthcare sector?,SELECT AVG(funding_round.round_size) FROM company INNER JOIN funding_round ON company.id = funding_round.company_id WHERE company.founder_gender = 'Female' AND company.industry = 'Healthcare';,"SELECT AVG(funding_round.round_size) AS average_funding_round_size
+FROM company
+JOIN funding_round ON company.id = funding_round.company_id
+WHERE company.industry = 'Healthcare' AND company.founder_gender = 'Female';",True,SELECT AVG(funding_round.round_size) FROM company INNER JOIN funding_round ON company.id = funding_round.company_id WHERE company.founder_gender = 'Female' AND company.industry = 'Healthcare';,True
+What is the maximum balance for high-risk accounts in the Africa region?,SELECT MAX(balance) FROM balances WHERE risk_level = 'high' AND region = 'Africa';,SELECT MAX(balance) FROM balances WHERE risk_level = 'high' AND region = 'Africa';,True,SELECT MAX(balance) FROM balances WHERE risk_level = 'high' AND region = 'Africa';,True
+How many transactions occurred in each region?,"SELECT region, COUNT(*) FROM transactions GROUP BY region;","SELECT region, COUNT(*) AS transaction_count
+FROM transactions
+GROUP BY region;",True,"SELECT region, COUNT(*) FROM transactions GROUP BY region;",True
+List the names of organizations that have made social impact investments in Latin America.,SELECT o.organization_name FROM social_impact_investments i INNER JOIN organizations o ON i.organization_id = o.organization_id WHERE i.region = 'Latin America';,SELECT T2.organization_name FROM organizations AS T1 INNER JOIN social_impact_investments AS T2 ON T1.organization_id = T2.organization_id WHERE T1.region = 'Latin America';,False,SELECT DISTINCT o.organization_name FROM social_impact_investments si JOIN organizations o ON si.organization_id = o.organization_id WHERE si.region = 'Latin America';,True
+What is the total assets of customers who have accounts in both New York and California branches?,"SELECT SUM(c.total_assets) FROM customers c INNER JOIN branches b ON c.branch_id = b.id WHERE b.name IN ('New York', 'California') GROUP BY b.name;","SELECT SUM(customers.total_assets) 
+FROM customers 
+JOIN branches ON customers.branch_id = branches.id 
+WHERE branches.name IN ('New York', 'California');",False,"SELECT SUM(customers.total_assets) FROM customers INNER JOIN branches ON customers.branch_id = branches.id WHERE branches.name IN ('New York', 'California');",False
+"Calculate the total value of loans issued to clients in the Asia-Pacific region, grouped by account type.","SELECT account_type, SUM(loan_amount) FROM loans WHERE client_region = 'Asia-Pacific' GROUP BY account_type;","SELECT account_type, SUM(loan_amount) as total_value
+FROM loans
+WHERE client_region = 'Asia-Pacific'
+GROUP BY account_type;",True,"SELECT account_type, SUM(loan_amount) FROM loans WHERE client_region = 'Asia-Pacific' GROUP BY account_type;",True
+What is the third highest account balance for Shariah-compliant finance customers?,"SELECT account_balance FROM (SELECT account_balance, RANK() OVER (ORDER BY account_balance DESC) as rn FROM shariah_compliant_finance) t WHERE rn = 3;","SELECT MAX(account_balance) FROM shariah_compliant_finance WHERE customer_id NOT IN (
+    SELECT customer_id FROM shariah_compliant_finance ORDER BY account_balance DESC LIMIT 3
+);",False,SELECT MAX(account_balance) FROM (SELECT DISTINCT account_balance FROM shariah_compliant_finance ORDER BY account_balance DESC LIMIT 3 OFFSET 2);,True
+How many unique social causes has investor ABC supported?,SELECT COUNT(DISTINCT cause) FROM investor_activities WHERE investor = 'ABC';,SELECT COUNT(DISTINCT cause) FROM investor_activities WHERE investor = 'ABC';,True,SELECT COUNT(DISTINCT cause) FROM investor_activities WHERE investor = 'ABC';,True
+"List all social impact investments in the Agriculture sector with ESG scores above 85, ordered by investment date and ESG score, including only investments made by French investors.","SELECT * FROM SocialImpactInvestments WHERE Sector = 'Agriculture' AND ESGScore > 85 AND InvestorCountry = 'France' ORDER BY InvestmentDate, ESGScore DESC;","SELECT *
+FROM SocialImpactInvestments
+WHERE Sector = 'Agriculture' AND ESGScore > 85 AND InvestorCountry = 'France'
+ORDER BY InvestmentDate, ESGScore;",True,"SELECT * FROM SocialImpactInvestments WHERE Sector = 'Agriculture' AND ESGScore > 85 AND InvestorCountry = 'France' ORDER BY InvestmentDate, ESGScore DESC;",True
+What is the maximum financial capability score in Africa?,SELECT MAX(score) FROM financial_capability WHERE country = 'Africa';,SELECT MAX(score) FROM financial_capability WHERE country = 'Africa';,True,"SELECT MAX(score) FROM financial_capability WHERE country IN ('Nigeria', 'South Africa', 'Egypt');",False
+What are the financial wellbeing programs in the United States and the United Kingdom?,"SELECT program_name FROM fwp_programs WHERE country IN ('USA', 'UK');","SELECT program_name FROM fwp_programs WHERE country IN ('United States', 'United Kingdom');",False,"SELECT program_name FROM fwp_programs WHERE country IN ('United States', 'United Kingdom');",False
+What is the total funding raised by startups from the US?,SELECT SUM(funding) FROM startups WHERE country = 'United States';,SELECT SUM(funding) FROM startups WHERE country = 'US';,True,SELECT SUM(funding) FROM startups WHERE country = 'USA';,True
+"Find the total number of investments in each sector, ordered from highest to lowest.","SELECT sector, COUNT(*) as total_investments FROM investments GROUP BY sector ORDER BY total_investments DESC;","SELECT sector, COUNT(*) AS investment_count
+FROM investments
+GROUP BY sector
+ORDER BY investment_count DESC;",True,"SELECT sector, COUNT(*) as num_investments FROM investments GROUP BY sector ORDER BY num_investments DESC;",True
+Show the number of financial wellbeing programs offered in each country.,"SELECT financial_wellbeing_programs.country, COUNT(financial_wellbeing_programs.program_id) FROM financial_wellbeing_programs GROUP BY financial_wellbeing_programs.country;","SELECT COUNT(*) AS num_programs, country FROM financial_wellbeing_programs GROUP BY country;",False,"SELECT country, COUNT(*) FROM financial_wellbeing_programs GROUP BY country;",True
+"What is the average amount of Shariah-compliant financing for clients in the top 3 countries with the most Shariah-compliant financing, excluding clients from Saudi Arabia and the UAE?","SELECT client_country, AVG(amount) as avg_financing FROM shariah_financing WHERE client_country NOT IN ('Saudi Arabia', 'UAE') GROUP BY client_country ORDER BY AVG(amount) DESC LIMIT 3;","SELECT AVG(amount) AS average_amount
+FROM shariah_financing
+WHERE client_country NOT IN ('Saudi Arabia', 'UAE')
+GROUP BY client_country
+ORDER BY count(*) DESC
+LIMIT 3;",False,"SELECT AVG(amount) FROM (SELECT client_id, client_country, amount FROM shariah_financing WHERE client_country NOT IN ('Saudi Arabia', 'UAE') ORDER BY amount DESC LIMIT 3) AS subquery;",False
+How many social impact investments were made in 'Asia' in 2019?,SELECT COUNT(*) FROM investments WHERE location = 'Asia' AND investment_year = 2019 AND investment_type = 'social impact';,SELECT COUNT(*) FROM investments WHERE location = 'Asia' AND investment_year = 2019 AND investment_type = 'Social Impact';,False,SELECT COUNT(*) FROM investments WHERE location = 'Asia' AND investment_year = 2019 AND investment_type = 'social impact';,True
+Average financial wellbeing score for programs in the Southern region,SELECT AVG(score) FROM financial_wellbeing_programs WHERE region = 'Southern';,SELECT AVG(score) FROM financial_wellbeing_programs WHERE region = 'Southern';,True,SELECT AVG(score) FROM financial_wellbeing_programs WHERE region = 'Southern';,True
+What is the total number of Shariah-compliant financial institutions in the United Arab Emirates?,SELECT COUNT(*) FROM shariah_compliant_finance WHERE country = 'United Arab Emirates';,SELECT COUNT(*) FROM shariah_compliant_finance WHERE country = 'United Arab Emirates';,True,SELECT COUNT(*) FROM shariah_compliant_finance WHERE country = 'United Arab Emirates';,True
+List the top 5 policyholders with the highest claim amounts in Texas.,"SELECT policyholders.policyholder_name, SUM(claims.claim_amount) AS total_claim_amount FROM claims JOIN policyholders ON claims.policyholder_id = policyholders.id WHERE policyholders.state = 'TX' GROUP BY policyholders.policyholder_name ORDER BY total_claim_amount DESC LIMIT 5;",SELECT policyholder_name FROM policyholders WHERE state = 'Texas' ORDER BY claim_amount DESC LIMIT 5;,False,"SELECT policyholder_name, SUM(claim_amount) as total_claim_amount FROM policyholders JOIN claims ON policyholders.id = claims.policyholder_id WHERE policyholders.state = 'Texas' GROUP BY policyholder_name ORDER BY total_claim_amount DESC LIMIT 5;",False
+What is the average claim amount per region?,"SELECT region, AVG(claim_amount) as avg_claim_amount FROM claims GROUP BY region;","SELECT AVG(claim_amount) AS avg_claim_amount_per_region
+FROM claims;",False,"SELECT region, AVG(claim_amount) FROM claims GROUP BY region;",True
+What is the total claim amount for policy number 1001?,SELECT SUM(claim_amount) FROM claims WHERE policy_id = 1001;,SELECT SUM(claim_amount) FROM claims WHERE policy_id = 1001;,True,SELECT SUM(claim_amount) FROM claims WHERE policy_id = 1001;,True
+What is the average assets value for customers in each region?,"SELECT region, AVG(assets_value) FROM customers GROUP BY region;","SELECT region, AVG(assets_value) AS avg_assets_value
+FROM customers
+GROUP BY region;",True,"SELECT region, AVG(assets_value) FROM customers GROUP BY region;",True
+How many investments were made in the 'Africa' region in Q4 2021?,SELECT COUNT(*) FROM investments WHERE region = 'Africa' AND date BETWEEN '2021-10-01' AND '2021-12-31';,"SELECT COUNT(*) FROM investments WHERE region = 'Africa' AND strftime('%Y-%m', date) LIKE '2021-10-%';",False,SELECT COUNT(*) FROM investments WHERE region = 'Africa' AND date BETWEEN '2021-10-01' AND '2021-12-31';,True
+How many social impact investments were made by investors from 'Canada' in 2020?,SELECT COUNT(*) FROM investments WHERE investor_country = 'Canada' AND investment_year = 2020;,SELECT COUNT(*) FROM investments WHERE investor_country = 'Canada' AND investment_year = 2020;,True,SELECT COUNT(*) FROM investments WHERE investor_country = 'Canada' AND investment_year = 2020;,True
+What is the average investment amount made in a specific country?,SELECT AVG(Amount) as AverageInvestment FROM Investments WHERE Country = 'USA';,"SELECT AVG(Amount) AS AverageAmount
+FROM Investments
+WHERE Country = 'SpecificCountry';",False,"SELECT Country, AVG(Amount) as AverageInvestment FROM Investments GROUP BY Country;",False
+What is the total amount of socially responsible loans issued to women in 2021?,SELECT SUM(loan_amount) FROM socially_responsible_lending WHERE borrower_gender = 'Female' AND lending_date BETWEEN '2021-01-01' AND '2021-12-31';,"SELECT SUM(loan_amount) FROM socially_responsible_lending WHERE borrower_gender = 'Female' AND strftime('%Y', lending_date) = '2021';",True,SELECT SUM(loan_amount) FROM socially_responsible_lending WHERE borrower_gender = 'Female' AND lending_date BETWEEN '2021-01-01' AND '2021-12-31';,True
+Find the total premium for auto policies in New Jersey.,SELECT SUM(policyholders.premium) FROM policyholders WHERE policyholders.state = 'New Jersey' AND policyholders.policy_type = 'Auto';,SELECT SUM(premium) FROM policyholders WHERE state = 'New Jersey' AND policy_type = 'Auto';,True,SELECT SUM(premium) FROM policyholders WHERE state = 'New Jersey' AND policy_type = 'Auto';,True
+What is the minimum transaction amount for clients who made their first transaction in Q1 2023 and have a credit score over 800?,SELECT MIN(total_amount) FROM transactions t INNER JOIN clients c ON t.client_id = c.client_id WHERE c.first_transaction_date = t.transaction_date AND c.credit_score > 800 AND t.transaction_date BETWEEN '2023-01-01' AND '2023-03-31',"SELECT MIN(total_amount) 
+FROM transactions 
+JOIN clients ON transactions.client_id = clients.client_id 
+WHERE MONTH(transactions.first_transaction_date) = 1 AND YEAR(transactions.first_transaction_date) = 2023 AND clients.credit_score > 800;",False,SELECT MIN(total_amount) FROM transactions t JOIN clients c ON t.client_id = c.client_id WHERE c.credit_score > 800 AND t.transaction_date BETWEEN '2023-01-01' AND '2023-03-31';,True
+What's the total number of sustainable investments made by venture capital firms in the United States?,SELECT SUM(value) FROM sustainable_investments JOIN venture_capitals ON sustainable_investments.venture_capital_id = venture_capitals.id WHERE venture_capitals.location = 'United States';,"SELECT SUM(value) FROM sustainable_investments WHERE venture_capital_id IN (
+    SELECT id FROM venture_capitals WHERE location = 'United States'
+);",True,SELECT SUM(value) FROM sustainable_investments JOIN venture_capitals ON sustainable_investments.venture_capital_id = venture_capitals.id WHERE venture_capitals.location = 'United States';,True
+What is the minimum funding amount received by a company founded by a person with a disability in the education industry?,SELECT MIN(r.funding_amount) FROM Companies c JOIN Investment_Rounds r ON c.id = r.company_id WHERE c.founders LIKE '%Disabled%' AND c.industry = 'Education';,"SELECT MIN(funding_amount) 
+FROM Investment_Rounds 
+JOIN Companies ON Investment_Rounds.company_id = Companies.id 
+WHERE Companies.founders LIKE '%disability%' AND Companies.industry = 'education';",False,SELECT MIN(funding_amount) FROM Companies c JOIN Investment_Rounds ir ON c.id = ir.company_id WHERE c.founders LIKE '%Disability%' AND c.industry = 'Education';,False
+Find the average transaction amount for each customer,"SELECT t.customer_id, AVG(t.amount) as avg_amount FROM transactions t GROUP BY t.customer_id;","SELECT c.name, AVG(t.amount) AS avg_transaction_amount
+FROM customers c
+JOIN transactions t ON c.customer_id = t.customer_id
+GROUP BY c.customer_id;",False,"SELECT c.name, AVG(t.amount) as avg_amount FROM customers c JOIN transactions t ON c.customer_id = t.customer_id GROUP BY c.name;",False
+What is the total transaction amount for each customer?,"SELECT c.name, SUM(t.transaction_amount) FROM customers c JOIN transactions t ON c.customer_id = t.customer_id GROUP BY c.name;","SELECT c.name, SUM(t.transaction_amount) AS total_transaction_amount
+FROM customers c
+JOIN transactions t ON c.customer_id = t.customer_id
+GROUP BY c.customer_id;",True,"SELECT c.name, SUM(t.transaction_amount) as total_transaction_amount FROM customers c JOIN transactions t ON c.customer_id = t.customer_id GROUP BY c.name;",True
+Identify the number of unique clients in the Oceanian region who have made at least one transaction.,SELECT COUNT(DISTINCT c.client_id) FROM clients c INNER JOIN transactions t ON c.client_id = t.client_id WHERE c.region = 'Oceanian';,"SELECT COUNT(DISTINCT T1.client_id) 
+FROM clients AS T1 
+JOIN transactions AS T2 ON T1.client_id = T2.client_id 
+WHERE T1.region = 'Oceania';",False,SELECT COUNT(DISTINCT c.client_id) FROM clients c INNER JOIN transactions t ON c.client_id = t.client_id WHERE c.region = 'Oceania';,False
+List all clients who have a socially responsible loan and a credit card?,SELECT DISTINCT srl.client_id FROM socially_responsible_loans srl JOIN credit_cards cc ON srl.client_id = cc.client_id;,SELECT client_id FROM socially_responsible_loans WHERE client_id IN (SELECT client_id FROM credit_cards);,True,SELECT s.client_id FROM socially_responsible_loans s INNER JOIN credit_cards c ON s.client_id = c.client_id;,True
+What is the maximum number of funding rounds for companies founded by women in the healthtech sector?,SELECT MAX(investment_rounds.funding_round) FROM company JOIN investment_rounds ON company.id = investment_rounds.company_id WHERE company.founder_gender = 'Female' AND company.industry = 'Healthtech';,"SELECT MAX(funding_round) FROM investment_rounds WHERE company_id IN (
+    SELECT id FROM company WHERE industry = 'Healthtech' AND founder_gender = 'Female'
+);",True,SELECT MAX(funding_round) FROM investment_rounds JOIN company ON investment_rounds.company_id = company.id WHERE company.founder_gender = 'Female' AND company.industry = 'Healthtech';,True
+What is the maximum credit limit for customers in Florida?,SELECT MAX(credit_limit) FROM customer WHERE state = 'Florida';,SELECT MAX(credit_limit) FROM customer WHERE state = 'Florida';,True,SELECT MAX(credit_limit) FROM customer WHERE state = 'Florida';,True
+What are the names of startups that have been acquired and have a female founder?,SELECT startup_name FROM acquisition WHERE female_founder = true;,SELECT startup_name FROM acquisition WHERE acquired_by = 'female' AND female_founder = TRUE;,False,SELECT startup_name FROM acquisition WHERE female_founder = TRUE;,True
+How many policies are there for each Underwriting team in NY?,"SELECT Team, COUNT(*) FROM Policies WHERE State = 'New York' GROUP BY Team;","SELECT Team, COUNT(*) AS PolicyCount
+FROM Policies
+WHERE State = 'NY'
+GROUP BY Team;",False,"SELECT Team, COUNT(*) FROM Policies WHERE State = 'NY' GROUP BY Team;",False
+What is the total number of policies issued per agent in the 'Eastern' region?,"SELECT Agents.AgentRegion, COUNT(Policies.PolicyID) AS TotalPolicies FROM Agents INNER JOIN Policies ON Agents.AgentID = Policies.AgentID WHERE Agents.AgentRegion = 'Eastern' GROUP BY Agents.AgentID;","SELECT COUNT(*) AS TotalPolicies, A.AgentID
+FROM Agents A
+JOIN Policies P ON A.AgentID = P.AgentID
+WHERE A.AgentRegion = 'Eastern'
+GROUP BY A.AgentID;",False,"SELECT A.AgentRegion, COUNT(P.PolicyID) as TotalPolicies FROM Agents A INNER JOIN Policies P ON A.AgentID = P.AgentID WHERE A.AgentRegion = 'Eastern' GROUP BY A.AgentRegion;",False
+How many startups were founded in 2018 by people with disabilities?,SELECT COUNT(*) FROM startups WHERE founding_year = 2018 AND founder_ability IS NOT NULL AND founder_ability <> 'No disability';,SELECT COUNT(*) FROM startups WHERE founding_year = 2018 AND founder_ability LIKE 'Disability';,True,SELECT COUNT(*) FROM startups WHERE founding_year = 2018 AND founder_ability = 'Disability';,True
+What is the average ESG rating for companies in the financial sector?,SELECT AVG(ESG_rating) FROM companies WHERE sector = 'Financial';,SELECT AVG(ESG_rating) FROM companies WHERE sector = 'financial';,False,SELECT AVG(ESG_rating) FROM companies WHERE sector = 'financial';,False
+Find the total assets of customers who have invested in stock 'ABC',SELECT SUM(asset_value) FROM customers c JOIN investments i ON c.id = i.customer_id WHERE i.stock_symbol = 'ABC';,"SELECT SUM(c.asset_value) AS total_assets
+FROM customers c
+JOIN investments i ON c.id = i.customer_id
+WHERE i.stock_symbol = 'ABC';",True,SELECT SUM(c.asset_value) FROM customers c JOIN investments i ON c.id = i.customer_id WHERE i.stock_symbol = 'ABC';,True
+What is the difference in total assets between customers who have invested in mutual funds and those who have not?,SELECT SUM(c.total_assets) - subquery.total_assets FROM customers c RIGHT JOIN (SELECT SUM(total_assets) as total_assets FROM customers c INNER JOIN investments i ON c.customer_id = i.customer_id WHERE i.investment_type = 'Mutual Funds') subquery ON 1=1;,"SELECT 
+    SUM(CASE WHEN investment_type = 'Mutual Funds' THEN total_assets ELSE 0 END) - 
+    SUM(CASE WHEN investment_type != 'Mutual Funds' THEN total_assets ELSE 0 END) AS asset_difference
+FROM 
+    customers;",False,SELECT SUM(c.total_assets) - SUM(i.value) FROM customers c LEFT JOIN investments i ON c.customer_id = i.customer_id WHERE i.investment_type = 'Mutual Fund';,False
+What is the total investment per client for each investment type?,"SELECT client_id, name, investment_type, SUM(investment) OVER (PARTITION BY client_id, investment_type ORDER BY client_id) as total_investment FROM clients;","SELECT 
+    c.client_id,
+    c.name,
+    i.investment_type,
+    SUM(i.investment) AS total_investment
+FROM 
+    clients c
+JOIN 
+    investments i ON c.client_id = i.client_id
+GROUP BY 
+    c.client_id, c.name, i.investment_type;",False,"SELECT client_id, investment_type, SUM(investment) FROM clients GROUP BY client_id, investment_type;",False
+When did the first fraud alert occur?,SELECT MIN(alert_date) FROM fraud_alerts;,SELECT MIN(alert_date) FROM fraud_alerts;,True,SELECT MIN(alert_date) FROM fraud_alerts;,True
+What is the average investment amount per round for companies founded by Latinx?,SELECT AVG(raised_amount) as avg_investment_per_round FROM investments JOIN diversity ON investments.company_id = diversity.company_id WHERE diversity.latinx_founder = true;,"SELECT AVG(raised_amount) AS avg_investment_per_round
+FROM investments
+JOIN diversity ON investments.company_id = diversity.company_id
+WHERE diversity.latinx_founder = TRUE;",True,SELECT AVG(raised_amount) FROM investments JOIN diversity ON investments.company_id = diversity.company_id WHERE diversity.latinx_founder = true;,True
+Calculate the sum of donations made by a specific donor 'Aisha' in 2021.,SELECT SUM(amount) FROM donations WHERE donor = 'Aisha' AND donation_date BETWEEN '2021-01-01' AND '2021-12-31';,"SELECT SUM(amount) AS total_donations
+FROM donations
+WHERE donor = 'Aisha'
+AND YEAR(donation_date) = 2021;",False,SELECT SUM(amount) FROM donations WHERE donor = 'Aisha' AND donation_date BETWEEN '2021-01-01' AND '2021-12-31';,True
+What is the sum of claim amounts paid to policyholders in 'Utah' and 'Idaho'?,"SELECT SUM(claim_amount) FROM claims WHERE policyholder_state IN ('Utah', 'Idaho');","SELECT SUM(claim_amount) FROM claims WHERE policyholder_state IN ('Utah', 'Idaho');",True,"SELECT SUM(claim_amount) FROM claims WHERE policyholder_state IN ('Utah', 'Idaho');",True
+Who are the top 3 underwriters with the highest claim amount in the Midwest region?,"SELECT Underwriters.UnderwriterID, Underwriters.Region, SUM(Claims.Amount) AS TotalClaimAmount FROM Claims INNER JOIN Underwriters ON Claims.UnderwriterID = Underwriters.UnderwriterID WHERE Underwriters.Region = 'Midwest' GROUP BY Underwriters.UnderwriterID, Underwriters.Region ORDER BY TotalClaimAmount DESC LIMIT 3;","SELECT U.UnderwriterID, U.Region, SUM(C.Amount) AS TotalClaimsAmount
+FROM Claims C
+JOIN Underwriters U ON C.UnderwriterID = U.UnderwriterID
+WHERE U.Region = 'Midwest'
+GROUP BY U.UnderwriterID, U.Region
+ORDER BY TotalClaimsAmount DESC
+LIMIT 3;",True,"SELECT Underwriters.UnderwriterID, SUM(Claims.Amount) AS TotalClaimAmount FROM Claims INNER JOIN Underwriters ON Claims.UnderwriterID = Underwriters.UnderwriterID WHERE Underwriters.Region = 'Midwest' GROUP BY Underwriters.UnderwriterID ORDER BY TotalClaimAmount DESC LIMIT 3;",False
+What is the total income and expenses for financial wellbeing programs in Australia?,"SELECT country, SUM(income) as total_income, SUM(expenses) as total_expenses FROM FinancialWellbeingPrograms WHERE country = 'Australia' GROUP BY country;","SELECT SUM(income) AS total_income, SUM(expenses) AS total_expenses
+FROM FinancialWellbeingPrograms
+WHERE country = 'Australia';",False,"SELECT SUM(income) as total_income, SUM(expenses) as total_expenses FROM FinancialWellbeingPrograms WHERE country = 'Australia';",False
+"List all investments in the 'renewable_energy' sector and their risk scores, ordered by risk score.",SELECT * FROM investments WHERE sector = 'renewable_energy' ORDER BY risk_score;,"SELECT id, name, risk_score FROM investments WHERE sector = 'renewable_energy' ORDER BY risk_score;",False,SELECT * FROM investments WHERE sector = 'renewable_energy' ORDER BY risk_score;,True
+Calculate the average Shariah-compliant loan amount in the Middle East and Africa.,"SELECT AVG(amount) FROM shariah_compliant_loans WHERE region IN ('Middle East', 'Africa');","SELECT AVG(amount) FROM shariah_compliant_loans WHERE region IN ('Middle East', 'Africa');",True,"SELECT AVG(amount) FROM shariah_compliant_loans WHERE region IN ('Middle East', 'Africa');",True
+Count the number of Shariah-compliant financial institutions in the Middle East and North Africa.,SELECT COUNT(*) FROM financial_institutions WHERE is_shariah_compliant = true AND (country = 'Middle East' OR country = 'North Africa');,"SELECT COUNT(*) FROM financial_institutions WHERE type = 'Bank' AND country IN ('Middle East', 'North Africa') AND is_shariah_compliant = TRUE;",True,"SELECT COUNT(*) FROM financial_institutions WHERE type = 'Shariah-compliant' AND country IN ('Middle East', 'North Africa');",True
+How many policies of each type were sold in Q1 of 2022?,"SELECT PolicyType, COUNT(*) OVER (PARTITION BY PolicyType) as PolicyCount FROM Policies WHERE SaleDate >= '2022-01-01' AND SaleDate < '2022-04-01';","SELECT PolicyType, COUNT(*) AS NumberOfPolicies
+FROM Policies
+WHERE SaleDate BETWEEN '2022-01-01' AND '2022-03-31'
+GROUP BY PolicyType;",True,"SELECT PolicyType, COUNT(*) as NumPoliciesSold FROM Policies WHERE SaleDate BETWEEN '2022-01-01' AND '2022-03-31' GROUP BY PolicyType;",True
+"What is the average transaction amount for clients with a net worth over $1,000,000 in Q4 2023?",SELECT AVG(total_amount) FROM transactions t INNER JOIN clients c ON t.client_id = c.client_id WHERE c.net_worth > 1000000 AND t.transaction_date BETWEEN '2023-10-01' AND '2023-12-31',"SELECT AVG(total_amount) AS average_transaction_amount
+FROM transactions
+JOIN clients ON transactions.client_id = clients.client_id
+WHERE clients.net_worth > 1000000 AND strftime('%Y', transactions.transaction_date) = '2023' AND strftime('%m', transactions.transaction_date) >= '10' AND strftime('%m', transactions.transaction_date) <= '12';",True,SELECT AVG(total_amount) FROM transactions INNER JOIN clients ON transactions.client_id = clients.client_id WHERE clients.net_worth > 1000000 AND transactions.transaction_date BETWEEN '2023-10-01' AND '2023-12-31';,True
+What is the minimum account balance for clients in the Northwest region?,SELECT MIN(account_balance) FROM clients WHERE region = 'Northwest';,SELECT MIN(account_balance) FROM clients WHERE region = 'Northwest';,True,SELECT MIN(account_balance) FROM clients WHERE region = 'Northwest';,True
+What is the maximum loan amount for socially responsible loans in the Asia-Pacific region?,SELECT MAX(srl.loan_amount) FROM socially_responsible_loans srl WHERE srl.region = 'Asia-Pacific';,SELECT MAX(loan_amount) FROM socially_responsible_loans WHERE region = 'Asia-Pacific';,True,SELECT MAX(loan_amount) FROM socially_responsible_loans WHERE region = 'Asia-Pacific';,True
+List all companies founded by individuals from the ASEAN region,"SELECT company_name FROM company_founding WHERE founder_country IN ('Singapore', 'Indonesia', 'Thailand', 'Malaysia', 'Philippines');","SELECT company_name FROM company_founding WHERE founder_country IN ('Thailand', 'Indonesia', 'Singapore', 'Philippines', 'Myanmar');",False,"SELECT * FROM company_founding WHERE founder_country IN ('Singapore', 'Malaysia', 'Indonesia', 'Philippines', 'Thailand');",False
+What is the total number of clients who have invested in the 'Global Fund'?,SELECT COUNT(DISTINCT c.client_id) FROM clients c JOIN investments i ON c.client_id = i.client_id JOIN funds f ON i.fund_id = f.fund_id WHERE f.fund_name = 'Global Fund';,SELECT COUNT(DISTINCT client_id) FROM investments WHERE fund_id = (SELECT fund_id FROM funds WHERE fund_name = 'Global Fund');,False,SELECT COUNT(DISTINCT c.client_id) FROM clients c INNER JOIN investments i ON c.client_id = i.client_id INNER JOIN funds f ON i.fund_id = f.fund_id WHERE f.category = 'Global Fund';,False
+Find the minimum ESG score for companies in the education sector.,SELECT MIN(ESG_score) FROM companies WHERE sector = 'Education';,SELECT MIN(ESG_score) FROM companies WHERE sector = 'education';,False,SELECT MIN(ESG_score) FROM companies WHERE sector = 'Education';,True
+How many unique 'regions' are represented in the 'Locations' table for 'RenewableEnergy'?,SELECT COUNT(DISTINCT region) FROM LocationsRE WHERE sector = 'RenewableEnergy';,SELECT COUNT(DISTINCT region) FROM LocationsRE WHERE sector = 'RenewableEnergy';,True,SELECT COUNT(DISTINCT region) FROM LocationsRE WHERE sector = 'RenewableEnergy';,True
+How many socially responsible lending loans have been issued by region?,"SELECT region, COUNT(loan_number) FROM socially_responsible_lending GROUP BY region;","SELECT COUNT(*) AS total_loans, region FROM socially_responsible_lending GROUP BY region;",False,"SELECT region, COUNT(*) FROM socially_responsible_lending GROUP BY region;",True
+"List all policies, claim types, and claim amounts for policyholders living in 'California'?","SELECT Policyholders.State, Claims.ClaimType, Claims.ClaimAmount FROM Policyholders INNER JOIN Claims ON Policyholders.PolicyholderID = Claims.PolicyholderID WHERE Policyholders.State = 'California';","SELECT P.PolicyholderID, C.ClaimType, C.ClaimAmount 
+FROM Policyholders P 
+JOIN Claims C ON P.PolicyholderID = C.PolicyholderID 
+WHERE P.State = 'California';",False,"SELECT Policyholders.State, Claims.ClaimType, Claims.ClaimAmount FROM Policyholders INNER JOIN Claims ON Policyholders.PolicyholderID = Claims.PolicyholderID WHERE Policyholders.State = 'California';",True
+List the policy types and total claim amount for policyholders from Ontario with an auto or life insurance policy.,"SELECT PolicyType, SUM(ClaimAmount) as TotalClaimAmount FROM Policyholder WHERE State = 'ON' AND PolicyType IN ('Auto', 'Life') GROUP BY PolicyType;","SELECT PolicyType, SUM(ClaimAmount) AS TotalClaimAmount
+FROM Policyholder
+WHERE State = 'Ontario' AND PolicyType IN ('Auto', 'Life')
+GROUP BY PolicyType;",False,"SELECT PolicyType, SUM(ClaimAmount) as TotalClaimAmount FROM Policyholder WHERE State = 'Ontario' AND PolicyType IN ('Auto', 'Life') GROUP BY PolicyType;",False
+What is the total transaction amount by transaction type?,"SELECT TransactionType, SUM(Amount) AS TotalAmount FROM Transactions GROUP BY TransactionType;","SELECT TransactionType, SUM(Amount) AS TotalAmount
+FROM Transactions
+GROUP BY TransactionType;",True,"SELECT TransactionType, SUM(Amount) as TotalAmount FROM Transactions GROUP BY TransactionType;",True
+Find the total number of policies for each policy state.,"SELECT PolicyState, COUNT(*) FROM Policies GROUP BY PolicyState;","SELECT PolicyState, COUNT(*) AS TotalPolicies
+FROM Policies
+GROUP BY PolicyState;",True,"SELECT PolicyState, COUNT(*) as TotalPolicies FROM Policies GROUP BY PolicyState;",True
+What are the names of female founders who have received Series A funding or higher?,"SELECT name FROM founder WHERE gender = 'Female' AND funding IN ('Series A', 'Series B', 'Series C', 'Series D', 'Series E');",SELECT name FROM founder WHERE gender = 'Female' AND funding >= 'Series A';,True,"SELECT DISTINCT name FROM founder WHERE gender = 'Female' AND funding IN ('Series A', 'Series B', 'Series C', 'Series D', 'Series E');",True
+"What is the average financial capability score for each occupation, pivoted by gender?","SELECT occupation, SUM(CASE WHEN gender = 'Male' THEN score ELSE 0 END)/SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) AS male_avg, SUM(CASE WHEN gender = 'Female' THEN score ELSE 0 END)/SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) AS female_avg FROM financial_capability_3 GROUP BY occupation;","SELECT 
+    occupation,
+    gender,
+    AVG(score) AS average_score
+FROM 
+    financial_capability_3
+GROUP BY 
+    occupation, gender;",False,"SELECT occupation, gender, AVG(score) OVER (PARTITION BY occupation, gender) as avg_score FROM financial_capability_3;",False
+What is the sum of ESG scores for 'Green Horizons' in H2 2021?,SELECT SUM(esg_score) FROM company_scores WHERE company = 'Green Horizons' AND year = 2021 AND quarter BETWEEN 3 AND 4;,SELECT SUM(esg_score) FROM company_scores WHERE company = 'Green Horizons' AND year = 2021 AND quarter = 2;,False,SELECT SUM(esg_score) FROM company_scores WHERE company = 'Green Horizons' AND year = 2021 AND quarter BETWEEN 2 AND 4;,True
+"List the top 3 states with the highest average claim amount for auto policies, ordered by the average claim amount in descending order.","SELECT State, AVG(ClaimAmount) as AvgClaimAmount FROM Claims WHERE PolicyType = 'Auto' GROUP BY State ORDER BY AvgClaimAmount DESC LIMIT 3;","SELECT State, AVG(ClaimAmount) AS AverageClaimAmount
+FROM Claims
+WHERE PolicyType = 'Auto'
+GROUP BY State
+ORDER BY AverageClaimAmount DESC
+LIMIT 3;",True,"SELECT State, AVG(ClaimAmount) as AvgClaimAmount FROM Claims WHERE PolicyType = 'Auto' GROUP BY State ORDER BY AvgClaimAmount DESC LIMIT 3;",True
+Show policy types that have not resulted in any claims yet.,SELECT DISTINCT PolicyType FROM Policy P WHERE NOT EXISTS (SELECT 1 FROM Claims C WHERE P.PolicyID = C.PolicyID);,SELECT PolicyType FROM Policy WHERE PolicyID NOT IN (SELECT PolicyID FROM Claims);,True,SELECT Policy.PolicyType FROM Policy LEFT JOIN Claims ON Policy.PolicyID = Claims.PolicyID WHERE Claims.ClaimID IS NULL;,True
+What is the maximum value of investments in the US stock market?,SELECT MAX(Value) FROM Investments WHERE Market = 'US',SELECT MAX(Value) FROM Investments WHERE Market = 'US Stock';,False,SELECT MAX(Value) FROM Investments WHERE Market = 'US Stock';,False
+What is the minimum and maximum age of customers from Japan?,"SELECT MIN(age), MAX(age) FROM customers WHERE country = 'Japan';","SELECT MIN(age) AS min_age, MAX(age) AS max_age FROM customers WHERE country = 'Japan';",True,"SELECT MIN(age) as min_age, MAX(age) as max_age FROM customers WHERE country = 'Japan';",True
+How many financial capability training sessions were conducted in Germany in Q1 of 2022?,SELECT COUNT(*) FROM financial_capability_training WHERE quarter = 1 AND year = 2022 AND country = 'Germany';,SELECT SUM(sessions) FROM financial_capability_training WHERE country = 'Germany' AND quarter = 1 AND year = 2022;,False,SELECT SUM(sessions) FROM financial_capability_training WHERE country = 'Germany' AND quarter = 1 AND year = 2022;,False
+What is the average age of policyholders who live in 'CA' and have a home insurance policy?,SELECT AVG(age) FROM policyholders WHERE state = 'CA' AND policy_type = 'home';,SELECT AVG(age) FROM policyholders WHERE state = 'CA' AND policy_type = 'Home';,False,SELECT AVG(age) FROM policyholders WHERE state = 'CA' AND policy_type = 'home';,True
+Calculate the average claim amount for policyholders living in 'TX'.,SELECT AVG(Claims.Amount) FROM Policyholders JOIN Claims ON Policyholders.PolicyholderID = Claims.PolicyholderID WHERE Policyholders.State = 'TX';,"SELECT AVG(Amount) AS AverageClaimAmount
+FROM Claims
+JOIN Policyholders ON Claims.PolicyholderID = Policyholders.PolicyholderID
+WHERE Policyholders.State = 'TX';",True,SELECT AVG(Amount) FROM Claims JOIN Policyholders ON Claims.PolicyholderID = Policyholders.PolicyholderID WHERE Policyholders.State = 'TX';,True
+How many customers have a credit card in the Kiva Community Credit Union?,"SELECT COUNT(*) FROM credit_cards WHERE card_type IN ('Platinum', 'Gold');",SELECT COUNT(DISTINCT customer_id) FROM credit_cards WHERE card_type = 'Kiva Community Credit Union';,False,SELECT COUNT(*) FROM credit_cards WHERE card_type = 'Kiva Community Credit Union';,False
+What is the average financial wellbeing score for customers in Europe?,"SELECT AVG(score) FROM financial_wellbeing_eu WHERE country IN ('Germany', 'France', 'UK');",SELECT AVG(score) FROM financial_wellbeing_eu WHERE country = 'Europe';,False,"SELECT AVG(score) FROM financial_wellbeing_eu WHERE country IN ('Germany', 'France', 'Italy');",False
+List all underwriting departments in 'Ontario' and 'Quebec' with their count?,"SELECT department, COUNT(*) FROM underwriting WHERE province IN ('ON', 'QC') GROUP BY department;","SELECT department, COUNT(*) FROM underwriting WHERE province IN ('Ontario', 'Quebec') GROUP BY department;",False,"SELECT department, COUNT(*) FROM underwriting WHERE province IN ('ON', 'QC') GROUP BY department;",True
+What is the minimum and maximum age of policyholders who have a policy with a premium between $1500 and $5000?,"SELECT MIN(Age), MAX(Age) FROM Policyholders WHERE Premium BETWEEN 1500 AND 5000;","SELECT MIN(Age) AS MinAge, MAX(Age) AS MaxAge
+FROM Policyholders
+WHERE Premium BETWEEN 1500 AND 5000;",True,"SELECT MIN(Age) as MinAge, MAX(Age) as MaxAge FROM Policyholders WHERE Premium BETWEEN 1500 AND 5000;",True
+Display the names of companies founded by individuals who identify as Black and have raised Seed or Series A funding.,"SELECT name FROM startup WHERE founder_identity LIKE 'Black%' AND funding IN ('Seed', 'Series A');","SELECT name FROM startup WHERE founder_identity = 'Black' AND funding IN ('Seed', 'Series A');",False,"SELECT name FROM startup WHERE founder_identity = 'Black' AND funding IN ('Seed', 'Series A');",False
+"What is the minimum balance for customers in the Africa region who have a balance greater than $10,000 in their savings account?",SELECT MIN(balance) FROM account_types WHERE account_type = 'Savings' AND customer_id IN (SELECT customer_id FROM account_types WHERE account_type = 'Checking' AND balance > 10000);,"SELECT MIN(balance) 
+FROM account_types 
+WHERE account_type = 'savings' AND balance > 10000 AND customer_id IN (
+    SELECT customer_id 
+    FROM account_types 
+    WHERE account_type = 'savings' AND balance > 10000 AND region = 'Africa'
+);",False,SELECT MIN(balance) FROM account_types WHERE account_type = 'Savings' AND customer_id IN (SELECT customer_id FROM account_types WHERE account_type = 'Savings' AND balance > 10000);,False
+"Identify the client with the highest balance in the Shariah-compliant finance database, and show their balance and name.","SELECT client_id, name, balance FROM shariah_compliant_finance ORDER BY balance DESC LIMIT 1;","SELECT client_id, name, balance FROM shariah_compliant_finance ORDER BY balance DESC LIMIT 1;",True,"SELECT client_id, name, balance FROM shariah_compliant_finance ORDER BY balance DESC LIMIT 1;",True
+How many 'diversity and inclusion' initiatives were implemented by companies in the 'finance' sector in 2022?,SELECT COUNT(*) FROM initiatives_companies WHERE company_sector = 'finance' AND initiative = 'diversity and inclusion' AND implementation_year = 2022;,SELECT COUNT(*) FROM initiatives_companies WHERE company_sector = 'finance' AND initiative LIKE '%diversity and inclusion%' AND implementation_year = 2022;,True,SELECT COUNT(*) FROM initiatives_companies WHERE company_sector = 'finance' AND initiative = 'diversity and inclusion' AND implementation_year = 2022;,True
+What is the total investment in the 'Green Energy' sector?,SELECT SUM(investment_amount) FROM sector_investments WHERE sector = 'Green Energy';,SELECT SUM(investment_amount) FROM sector_investments WHERE sector = 'Green Energy';,True,SELECT SUM(investment_amount) FROM sector_investments WHERE sector = 'Green Energy';,True
+Select the average age of policyholders,SELECT AVG(Age) FROM Policyholders;,SELECT AVG(Age) FROM Policyholders;,True,SELECT AVG(Age) FROM Policyholders;,True
+What is the total funding amount received by companies founded by LGBTQ+ entrepreneurs in the transportation industry?,SELECT SUM(r.funding_amount) FROM Companies c JOIN Investment_Rounds r ON c.id = r.company_id WHERE c.founders LIKE '%LGBTQ+%' AND c.industry = 'Transportation';,"SELECT SUM(I.funding_amount) AS total_funding
+FROM Companies C
+JOIN Investment_Rounds I ON C.id = I.company_id
+WHERE C.founders LIKE '%LGBTQ+' AND C.industry = 'Transportation';",False,SELECT SUM(funding_amount) FROM Companies INNER JOIN Investment_Rounds ON Companies.id = Investment_Rounds.company_id WHERE Companies.founders LIKE '%LGBTQ+' AND Companies.industry = 'Transportation';,False
+How many financially capable clients have a loan?,SELECT COUNT(*) FROM clients INNER JOIN loans ON clients.client_id = loans.client_id WHERE clients.is_financially_capable = true;,SELECT COUNT(client_id) FROM clients WHERE is_financially_capable = TRUE AND client_id IN (SELECT client_id FROM loans);,True,SELECT COUNT(*) FROM clients c INNER JOIN loans l ON c.client_id = l.client_id WHERE c.is_financially_capable = TRUE;,True
+What is the average investment amount in 'Asia'?,SELECT AVG(investment_amount) FROM investment_regions WHERE region = 'Asia';,SELECT AVG(investment_amount) FROM investment_regions WHERE region = 'Asia';,True,SELECT AVG(investment_amount) FROM investment_regions WHERE region = 'Asia';,True
+Find the total assets of Shariah-compliant financial institutions in the Middle East and North Africa?,SELECT SUM(assets) FROM financial_institutions WHERE shariah_compliant = TRUE AND location LIKE 'Middle East%' OR location LIKE 'North Africa%';,SELECT SUM(assets) FROM financial_institutions WHERE shariah_compliant = TRUE AND location LIKE 'Middle East or North Africa';,True,SELECT SUM(assets) FROM financial_institutions WHERE shariah_compliant = true AND location LIKE 'Middle East%';,True
+What is the average claim amount for policyholders with a car model of 'Corolla'?,SELECT AVG(amount) FROM Claims INNER JOIN Auto ON Claims.policyholder_id = Auto.policyholder_id WHERE car_model = 'Corolla';,SELECT AVG(amount) FROM Claims WHERE policyholder_id IN (SELECT policyholder_id FROM Auto WHERE car_model = 'Corolla');,True,SELECT AVG(amount) FROM Claims JOIN Auto ON Claims.policyholder_id = Auto.policyholder_id WHERE car_model = 'Corolla';,True
+What is the policy term length for the policyholder with the highest risk assessment score?,SELECT policy_term_length FROM policies WHERE risk_assessment_score = (SELECT MAX(risk_assessment_score) FROM policies);,SELECT policy_term_length FROM policies WHERE risk_assessment_score = ( SELECT MAX(risk_assessment_score) FROM policies );,True,SELECT policy_term_length FROM policies WHERE risk_assessment_score = (SELECT MAX(risk_assessment_score) FROM policies);,True
+"List the top 3 industries with the highest average total funding per company, excluding companies with less than $1M in total funding.","SELECT industry, AVG(total_funding) AS industry_avg_funding FROM Companies WHERE total_funding >= 1000000 GROUP BY industry ORDER BY industry_avg_funding DESC LIMIT 3;","SELECT industry, AVG(total_funding) as avg_funding
+FROM Companies
+WHERE total_funding >= 1000000
+GROUP BY industry
+ORDER BY avg_funding DESC
+LIMIT 3;",True,"SELECT industry, AVG(total_funding) as avg_funding FROM Companies WHERE total_funding >= 1000000 GROUP BY industry ORDER BY avg_funding DESC LIMIT 3;",True
+Calculate the percentage of Shariah-compliant investments held by each investor in the top 5 countries with the highest percentage?,"SELECT investor_name, ROUND((SUM(CASE WHEN is_shariah_compliant THEN investment_value ELSE 0 END) / SUM(investment_value)) * 100, 2) AS percentage FROM investments JOIN investors ON investments.investor_id = investors.investor_id GROUP BY investor_name ORDER BY percentage DESC LIMIT 5;","SELECT 
+    i.investor_name,
+    SUM(CASE WHEN i.is_shariah_compliant THEN 1 ELSE 0 END) * 100 / COUNT(i.investment_id) AS shariah_percentage,
+    c.country
+FROM 
+    investors i
+JOIN 
+    investments j ON i.investor_id = j.investor_id
+GROUP BY 
+    i.investor_name, c.country
+ORDER BY 
+    shariah_percentage DESC
+LIMIT 5;",False,"SELECT i.investor_name, (COUNT(*) FILTER (WHERE is_shariah_compliant = TRUE)) * 100.0 / COUNT(*) AS percentage FROM investors i JOIN investments j ON i.investor_id = j.investor_id WHERE i.country IN (SELECT country FROM (SELECT country, ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) as rank FROM investors GROUP BY country) WHERE rank <= 5) GROUP BY i.investor_name;",True
+What is the total claim amount for each gender?,"SELECT gender, SUM(claim_amount) AS total_claim_amount FROM claims JOIN policyholders ON claims.policyholder_id = policyholders.id GROUP BY gender;","SELECT gender, SUM(claim_amount) AS total_claim_amount
+FROM claims
+GROUP BY gender;",False,"SELECT gender, SUM(claim_amount) FROM claims JOIN policyholders ON claims.policyholder_id = policyholders.id GROUP BY gender;",True

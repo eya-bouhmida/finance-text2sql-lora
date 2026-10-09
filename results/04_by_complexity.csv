@@ -1,0 +1,7 @@
+sql_complexity,n,Baseline (%),Fine-tuné (%),Gain (points)
+basic SQL,79,67.1,78.5,11.4
+single join,35,54.3,62.9,8.6
+aggregation,31,54.8,74.2,19.4
+window functions,6,33.3,66.7,33.4
+subqueries,5,40.0,40.0,0.0
+multiple_joins,2,0.0,0.0,0.0

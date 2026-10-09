@@ -1,0 +1,23 @@
+{
+  "n_test": 158,
+  "baseline": {
+    "n": 158,
+    "execution_accuracy": 58.86,
+    "valid_sql_rate": 92.41,
+    "exact_match": 24.68,
+    "sec_per_question": 0.363
+  },
+  "finetuned": {
+    "n": 158,
+    "execution_accuracy": 71.52,
+    "valid_sql_rate": 98.73,
+    "exact_match": 38.61,
+    "sec_per_question": 0.598
+  },
+  "mcnemar": {
+    "fixed": 24,
+    "broken": 4,
+    "p_value": 0.00018
+  },
+  "adapter_mb": 85.3
+}
