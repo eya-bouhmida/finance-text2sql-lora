@@ -1,0 +1,10 @@
+transformers
+peft
+trl
+bitsandbytes
+accelerate
+datasets
+pandas
+matplotlib
+sqlparse
+gradio
